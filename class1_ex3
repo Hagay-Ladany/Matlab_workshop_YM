@@ -1,0 +1,115 @@
+%Import that data into Matlab:
+T=readtable("brca_tcga_pan_can_atlas_2018_clinical_data_.txt",'TreatAsEmpty',{'.','NA'});
+% Remove samples with missing data:
+T=T(find(T.Subtype~="NA"),:);
+%wanted variables:
+Age=T.DiagnosisAge;
+MutationCount=T.MutationCount;
+%wanted groups:
+Subtype=T.Subtype;
+f_LumA=find(Subtype=="BRCA_LumA");
+f_LumB=find(Subtype=="BRCA_LumB");
+f_Her2=find(Subtype=="BRCA_Her2");
+f_Basal=find(Subtype=="BRCA_Basal");
+f_Normal=find(Subtype=="BRCA_Normal");
+% R (pearson) and P values for Age vs MutationCount in each group:
+[R_LumA,P_LumA]=corrcoef(Age(f_LumA),log10(MutationCount(f_LumA)));
+[R_LumB,P_LumB]=corrcoef(Age(f_LumB),log10(MutationCount(f_LumB)));
+[R_Her2,P_Her2]=corrcoef(Age(f_Her2),log10(MutationCount(f_Her2)));
+[R_Basal,P_Basal]=corrcoef(Age(f_Basal),log10(MutationCount(f_Basal)));
+[R_Normal,P_Normal]=corrcoef(Age(f_Normal),log10(MutationCount(f_Normal)));
+[S_LumA, sP_LumA] = corr(Age(f_LumA),(MutationCount(f_LumA)),'Type','Spearman');
+[S_LumB, sP_LumB] = corr(Age(f_LumB),(MutationCount(f_LumB)),'Type','Spearman');
+[S_Her2, sP_Her2] = corr(Age(f_Her2),(MutationCount(f_Her2)),'Type','Spearman');
+[S_Basal, sP_Basal] = corr(Age(f_Basal),(MutationCount(f_Basal)),'Type','Spearman');
+[S_Normal, sP_Normal] = corr(Age(f_Normal),(MutationCount(f_Normal)),'Type','Spearman');
+%The multipleScatterPlot is too scrambled to see any differences...
+%gscatter(Age,log10(MutationCount),Subtype);
+%ScatterPlots for each Subtype:
+fig1_f_LumA = figure();
+scatter(Age(f_LumA),log10(MutationCount(f_LumA)),30,'MarkerEdgeColor',[0 0 0],...
+              'MarkerFaceColor',[0 1 1],...
+              'LineWidth',.8); 
+P_f_LumA=polyfit(Age(f_LumA),log10(MutationCount(f_LumA)),1);
+m_f_LumA=P_f_LumA(1);
+b_f_LumA=P_f_LumA(2);
+eq_f_LumA = ['y = (' num2str(m_f_LumA) ')x + (' num2str(b_f_LumA) ')' newline 'p-val(pearson,Spearman):' num2str(P_LumA(2)) ', ' num2str(sP_LumA) newline 'R(pearson,Spearman):' num2str(R_LumA(2)) ', ' num2str(S_LumA)];
+xlabel('Age(years)');
+ylabel('log_1_0MutationCount');
+title({'Age Vs Log_1_0MutationCount',eq_f_LumA});
+refline;
+legend('Luminal A');
+%-------the same for other subtypes..
+fig1_f_LumB = figure();
+scatter(Age(f_LumB),log10(MutationCount(f_LumB)),30,'MarkerEdgeColor',[0 0 0],...
+              'MarkerFaceColor',[1 0 0],...
+              'LineWidth',.8); 
+P_f_LumB=polyfit(Age(f_LumB),log10(MutationCount(f_LumB)),1);
+m_f_LumB=P_f_LumB(1);
+b_f_LumB=P_f_LumB(2);
+eq_f_LumB = ['y = (' num2str(m_f_LumB) ')x + (' num2str(b_f_LumB) ')' newline  'p-val(pearson,Spearman):' num2str(P_LumB(2)) ', ' num2str(sP_LumB) newline 'R(pearson,Spearman):' num2str(R_LumB(2)) ', ' num2str(S_LumB)];
+xlabel('Age(years)');
+ylabel('log_1_0MutationCount');
+title({'Age Vs Log_1_0MutationCount',eq_f_LumB});
+refline;
+legend('Luminal B');
+
+fig1_f_Her2 = figure();
+scatter(Age(f_Her2),log10(MutationCount(f_Her2)),30,'MarkerEdgeColor',[0 0 0],...
+              'MarkerFaceColor',[0 1 0],...
+              'LineWidth',.8); 
+P_f_Her2=polyfit(Age(f_Her2),log10(MutationCount(f_Her2)),1);
+m_f_Her2=P_f_Her2(1);
+b_f_Her2=P_f_Her2(2);
+eq_f_Her2 = ['y = (' num2str(m_f_Her2) ')x + (' num2str(b_f_Her2) ')' newline 'p-val(pearson,Spearman):' num2str(P_Her2(2)) ' , ' num2str(sP_Her2) newline 'R(pearson,Spearman):' num2str(R_Her2(2)) ', ' num2str(S_Her2)];
+xlabel('Age(years)');
+ylabel('log_1_0MutationCount');
+title({'Age Vs Log_1_0MutationCount',eq_f_Her2});
+refline;
+legend('HER2-enriched');
+
+fig1_f_Basal = figure();
+scatter(Age(f_Basal),log10(MutationCount(f_Basal)),30,'MarkerEdgeColor',[0 0 0],...
+              'MarkerFaceColor',[0 0 1],...
+              'LineWidth',.8); 
+P_f_Basal=polyfit(Age(f_Basal),log10(MutationCount(f_Basal)),1);
+m_f_Basal=P_f_Basal(1);
+b_f_Basal=P_f_Basal(2);
+eq_f_Basal = ['y = (' num2str(m_f_Basal) ')x + (' num2str(b_f_Basal) ')' newline 'p-val(pearson,Spearman):' num2str(P_Basal(2)) ', '  num2str(sP_Basal) newline 'R(pearson,Spearman):' num2str(R_Basal(2)) ', ' num2str(S_Basal)];
+xlabel('Age(years)');
+ylabel('log_1_0MutationCount');
+title({'Age Vs Log_1_0MutationCount',eq_f_Basal });
+refline;
+legend('Triple-negative/basal-like');
+
+fig1_f_Normal = figure();
+scatter(Age(f_Normal),log10(MutationCount(f_Normal)),30,'MarkerEdgeColor',[0 0 0],...
+              'MarkerFaceColor',[1 1 0],...
+              'LineWidth',.8); 
+P_f_Normal=polyfit(Age(f_Normal),log10(MutationCount(f_Normal)),1);
+m_f_Normal=P_f_Normal(1);
+b_f_Normal=P_f_Normal(2);
+eq_f_Normal = ['y = (' num2str(m_f_Normal) ')x + (' num2str(b_f_Normal) ')' newline 'p-val(pearson,Spearman):' num2str(P_Normal(2)) ', '  num2str(sP_Normal) newline 'R(pearson,Spearman):' num2str(R_Normal(2)) ', ' num2str(S_Normal)];
+xlabel('Age(years)');
+ylabel('log_1_0MutationCount');
+title({'Age Vs Log_1_0MutationCount',eq_f_Normal});
+refline;
+legend('Normal-like');
+
+[ht(1,2),pt(1,2)]=ttest2(MutationCount(f_LumA),MutationCount(f_LumB));
+[ht(1,3),pt(1,3)]=ttest2(MutationCount(f_LumA),MutationCount(f_Basal));
+[ht(1,4),pt(1,4)]=ttest2(MutationCount(f_LumA),MutationCount(f_Her2));
+[ht(1,5),pt(1,5)]=ttest2(MutationCount(f_LumA),MutationCount(f_Normal));
+[ht(2,3),pt(2,3)]=ttest2(MutationCount(f_LumB),MutationCount(f_Basal));
+[ht(2,4),pt(2,4)]=ttest2(MutationCount(f_LumB),MutationCount(f_Her2));
+[ht(2,5),pt(2,5)]=ttest2(MutationCount(f_LumB),MutationCount(f_Normal));
+[ht(3,4),pt(3,4)]=ttest2(MutationCount(f_Basal),MutationCount(f_Her2));
+[ht(3,5),pt(3,5)]=ttest2(MutationCount(f_Basal),MutationCount(f_Normal));
+[ht(4,5),pt(4,5)]=ttest2(MutationCount(f_Her2),MutationCount(f_Normal));
+
+ht2 = array2table(ht,'VariableNames',{'f_LumA' 'f_LumB' 'f_Basal' 'f_Her2' 'f_Normal'});
+ht2 = table(ht2,'RowNames',{'f_LumB' 'f_Basal' 'f_Her2' 'f_Normal'});
+pt2 = array2table(pt,'VariableNames',{'f_LumA' 'f_LumB' 'f_Basal' 'f_Her2' 'f_Normal'});
+pt2 = table(pt2,'RowNames',{'f_LumA' 'f_LumB' 'f_Basal' 'f_Her2'});
+
+ boxplot(log10(MutationCount),Subtype,'Notch','on','Labels',{'Luminal A: n = 499','Her2: n = 78 ', 'Luminal B: n = 197','Normal: n = 36','Basal: n = 171'},'Whisker',1)
